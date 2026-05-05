@@ -4,297 +4,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Крестики-нолики PWA</title>
+    <title>Tic Tac Toe PWA</title>
     
     <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Крестики-нолики">
+    <meta name="apple-mobile-web-app-title" content="Крестики-Нолики">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#764ba2">
+    <meta name="theme-color" content="#4f46e5">
     
-    <!-- Web App Manifest (Inline for simplicity) -->
-    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIktyZXN0aWtpLU5vbGlraSBQV0EiLAogICJzaG9ydF9uYW1lIjogIlRpY1RhY1RvZSIsCiAgImRlc2NyaXB0aW9uIjogIkNsYXNzaWMgVGljIFRhYyBUb2UgR2FtZSIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjNzY0YmEyIiwKICAidGhlbWVfY29sb3IiOiAiIzc2NGJhMiIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzU2Ni81NjYyOTQucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9">
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIktyZXN0aWtpLU5vbGlraSBQV0EiLAogICJzaG9ydF9uYW1lIjogIlRpY1RhY1RvZSIsCiAgImRlc2NyaXB0aW9uIjogIkNsYXNzaWMgVGljIFRhYyBUb2UgR2FtZSB3aXRoIE9mZmxpbmUgc3VwcG9ydCIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiM0ZjQ2ZTUiLAogICJ0aGVtZV9jb2xvciI6ICIjNGY0NmU1IiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9jZG4taWNvbnMtcG5nLmZsYXRpY29uLmNvbS81MTIvNTY2LzU2NjI5NC5wbmciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzU2Ni81NjYyOTQucG5nIiwKICAgICAgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIgogICAgfQogIF0KfQ==">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --safe-area-inset-top: env(safe-area-inset-top, 0px);
-            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            min-height: -webkit-fill-available;
+            background-color: #1a1a1a;
+            background: radial-gradient(circle at top right, #4f46e5, #1e1b4b);
+            height: 100vh;
+            height: -webkit-fill-available;
+            margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: system-ui, -apple-system, sans-serif;
-            margin: 0;
-            overflow: hidden; /* Запрет скролла для эффекта приложения */
-            touch-action: manipulation;
+            overflow: hidden;
+            touch-action: none; /* Полная блокировка системных жестов браузера */
+            -webkit-user-select: none;
+            user-select: none;
         }
 
-        .app-container {
-            padding-top: var(--safe-area-inset-top);
-            padding-bottom: var(--safe-area-inset-bottom);
+        .app-shell {
             width: 100%;
             height: 100%;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px) 20px;
+            box-sizing: border-box;
+            max-width: 500px;
         }
 
-        .card {
-            width: min(90vw, 400px);
-            max-height: 90vh;
+        .game-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2.5rem;
+            flex: 1;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         .cell {
-            transition: all 0.2s ease;
             aspect-ratio: 1 / 1;
-            user-select: none;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2rem, 10vw, 3.5rem);
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             -webkit-tap-highlight-color: transparent;
         }
 
-        .cell:active:not(.occupied) {
-            transform: scale(0.9);
-            background-color: rgba(255, 255, 255, 0.2);
+        .cell:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .symbol-enter {
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        .cell.occupied {
+            cursor: default;
         }
 
-        @keyframes popIn {
+        .cell.win {
+            background: #22c55e !important;
+            color: white !important;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .status-badge {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @keyframes pop {
             0% { transform: scale(0.5); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .winning-cell {
-            background-color: rgba(34, 197, 94, 0.5) !important;
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
-        }
-
-        /* Адаптация сетки под высоту экрана */
-        @media (max-height: 600px) {
-            .card { width: min(70vh, 400px); }
-            h1 { font-size: 1.5rem !important; margin-bottom: 1rem !important; }
-        }
+        .symbol { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="card bg-white/10 backdrop-blur-xl rounded-[2rem] p-6 sm:p-8 shadow-2xl border border-white/20 text-white text-center">
-            <h1 class="text-3xl sm:text-4xl font-black mb-4 sm:mb-6 tracking-tight uppercase">Tic Tac Toe</h1>
-            
-            <!-- Выбор режима -->
-            <div id="setup" class="flex-grow flex flex-col justify-center space-y-4">
-                <p class="text-lg opacity-80">Выберите режим:</p>
-                <button onclick="startGame('pvp')" class="w-full py-4 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/20 font-bold text-lg">С другом</button>
-                <button onclick="startGame('pve')" class="w-full py-4 bg-indigo-500 hover:bg-indigo-600 rounded-2xl transition-all shadow-lg font-bold text-lg">Против ИИ</button>
+
+    <div class="app-shell">
+        <div class="game-card">
+            <!-- Header -->
+            <div class="text-center">
+                <h1 class="text-white text-3xl font-black italic tracking-tighter mb-1">TIC TAC TOE</h1>
+                <div id="game-info" class="flex justify-center gap-2 text-white/60">
+                    <span id="mode-text" class="status-badge">Offline Mode</span>
+                </div>
             </div>
 
-            <!-- Игровое поле -->
-            <div id="game-container" class="hidden flex-grow flex flex-col">
-                <div class="flex justify-around items-center mb-6 bg-black/20 rounded-2xl py-3 px-2">
-                    <div id="player-x" class="px-4 py-1 rounded-xl transition-all duration-300">Игрок X</div>
-                    <div class="opacity-30">|</div>
-                    <div id="player-o" class="px-4 py-1 rounded-xl transition-all duration-300">Игрок O</div>
+            <!-- Menu Screen -->
+            <div id="menu-screen" class="space-y-4 py-10">
+                <button onclick="initGame('pvp')" class="w-full py-5 bg-white text-indigo-900 rounded-2xl font-bold text-xl shadow-xl active:scale-95 transition-transform">С ДРУГОМ</button>
+                <button onclick="initGame('pve')" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-bold text-xl shadow-xl active:scale-95 transition-transform border border-indigo-400">ПРОТИВ ИИ</button>
+                <p class="text-center text-white/40 text-sm">Играйте даже без интернета</p>
+            </div>
+
+            <!-- Game Screen -->
+            <div id="game-screen" class="hidden flex-grow flex flex-col justify-center">
+                <div class="flex justify-between items-center mb-8">
+                    <div id="p1-label" class="text-white text-lg font-bold px-4 py-2 rounded-xl transition-all">X (Вы)</div>
+                    <div class="text-white/20 text-2xl font-black">VS</div>
+                    <div id="p2-label" class="text-white text-lg font-bold px-4 py-2 rounded-xl transition-all opacity-40">O</div>
                 </div>
 
                 <div id="board" class="grid grid-cols-3 gap-3">
-                    <!-- Ячейки -->
+                    <!-- JS Grid -->
                 </div>
 
-                <div id="status" class="mt-6 text-lg font-medium h-6 opacity-90 italic"></div>
-                
-                <div class="mt-auto pt-6 flex flex-col gap-3">
-                    <button onclick="resetGame()" class="w-full py-3 bg-white text-indigo-700 font-black rounded-xl hover:bg-indigo-50 transition-colors shadow-lg active:scale-95">
-                        СБРОСИТЬ
-                    </button>
-                    <button onclick="backToMenu()" class="text-xs uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity">
-                        В меню
-                    </button>
-                </div>
+                <div id="status-msg" class="text-center mt-6 text-white/80 font-medium h-6">Ваш ход...</div>
+            </div>
+
+            <!-- Footer Controls -->
+            <div id="game-controls" class="hidden pt-6 space-y-3">
+                <button onclick="resetGame()" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition-colors">СБРОСИТЬ</button>
+                <button onclick="showMenu()" class="w-full text-white/30 text-xs font-bold tracking-widest uppercase py-2">В главное меню</button>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно -->
-    <div id="modal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-6 z-50">
-        <div class="bg-white text-gray-900 p-8 rounded-[2.5rem] shadow-2xl w-full max-w-xs text-center transform scale-90 transition-all" id="modal-content">
-            <div id="winner-icon" class="text-6xl mb-4 text-indigo-500">🏆</div>
-            <h2 id="modal-title" class="text-3xl font-black mb-2 uppercase">Победа!</h2>
-            <p id="modal-message" class="text-gray-500 mb-8 font-medium"></p>
-            <button onclick="closeModal()" class="w-full py-4 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 shadow-xl active:scale-95 transition-transform">
-                ИГРАТЬ СНОВА
-            </button>
+    <!-- Win Modal -->
+    <div id="win-modal" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/90 backdrop-blur-sm hidden">
+        <div class="bg-indigo-600 p-8 rounded-[3rem] text-center w-full max-w-xs shadow-2xl border border-indigo-400">
+            <div id="win-icon" class="text-6xl mb-4">🎉</div>
+            <h2 id="win-title" class="text-white text-4xl font-black mb-2">ПОБЕДА!</h2>
+            <p id="win-desc" class="text-indigo-100 mb-8 font-medium">Игрок X оказался сильнее.</p>
+            <button onclick="closeModal()" class="w-full py-4 bg-white text-indigo-600 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-transform">ЕЩЕ РАЗ</button>
         </div>
     </div>
 
     <script>
-        // --- Offline Service Worker Logic ---
-        const swCode = `
-            const CACHE_NAME = 'ttt-v1';
-            const ASSETS = [
-                '/',
-                'index.html',
-                'https://cdn.tailwindcss.com'
-            ];
-
-            self.addEventListener('install', (e) => {
-                e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+        // SERVICE WORKER FOR OFFLINE
+        const swContent = `
+            const CACHE = 'ttt-pwa-v2';
+            self.addEventListener('install', e => {
+                e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', 'https://cdn.tailwindcss.com'])));
             });
-
-            self.addEventListener('fetch', (e) => {
-                e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+            self.addEventListener('fetch', e => {
+                e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
             });
         `;
-
         if ('serviceWorker' in navigator) {
-            const blob = new Blob([swCode], { type: 'text/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(console.error);
+            const blob = new Blob([swContent], {type: 'application/javascript'});
+            navigator.serviceWorker.register(URL.createObjectURL(blob));
         }
 
-        // --- Game Logic ---
+        // GAME ENGINE
         let board = Array(9).fill(null);
-        let currentPlayer = 'X';
-        let isGameActive = false;
-        let gameMode = 'pvp';
-        
-        const boardElement = document.getElementById('board');
-        const statusElement = document.getElementById('status');
-        const playerXElement = document.getElementById('player-x');
-        const playerOElement = document.getElementById('player-o');
-        const setupElement = document.getElementById('setup');
-        const gameContainer = document.getElementById('game-container');
-        const modal = document.getElementById('modal');
+        let turn = 'X';
+        let active = false;
+        let mode = 'pvp';
+        const winPatterns = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
-        const winningConditions = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8],
-            [0, 3, 6], [1, 4, 7], [2, 5, 8],
-            [0, 4, 8], [2, 4, 6]
-        ];
-
-        function createBoard() {
-            boardElement.innerHTML = '';
-            for (let i = 0; i < 9; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell bg-white/5 rounded-2xl flex items-center justify-center text-4xl font-black cursor-pointer border border-white/5';
-                cell.dataset.index = i;
-                cell.addEventListener('click', () => handleCellClick(i));
-                boardElement.appendChild(cell);
-            }
-        }
-
-        function startGame(mode) {
-            gameMode = mode;
-            setupElement.classList.add('hidden');
-            gameContainer.classList.remove('hidden');
+        function initGame(m) {
+            mode = m;
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-controls').classList.remove('hidden');
+            document.getElementById('mode-text').innerText = m === 'pve' ? 'VS Computer' : '2 Players';
             resetGame();
         }
 
-        function backToMenu() {
-            setupElement.classList.remove('hidden');
-            gameContainer.classList.add('hidden');
+        function showMenu() {
+            document.getElementById('menu-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-controls').classList.add('hidden');
         }
 
-        function handleCellClick(index) {
-            if (!isGameActive || board[index] !== null) return;
-            makeMove(index);
-            if (isGameActive && gameMode === 'pve' && currentPlayer === 'O') {
-                isGameActive = false;
-                setTimeout(aiMove, 500);
+        function resetGame() {
+            board = Array(9).fill(null);
+            turn = 'X';
+            active = true;
+            render();
+            updateUI();
+        }
+
+        function render() {
+            const container = document.getElementById('board');
+            container.innerHTML = '';
+            board.forEach((val, i) => {
+                const cell = document.createElement('div');
+                cell.className = `cell ${val ? 'occupied' : ''}`;
+                if (val) {
+                    const span = document.createElement('span');
+                    span.className = 'symbol';
+                    span.innerText = val;
+                    span.style.color = val === 'X' ? '#818cf8' : '#fb7185';
+                    cell.appendChild(span);
+                }
+                cell.onclick = () => handleMove(i);
+                container.appendChild(cell);
+            });
+        }
+
+        function handleMove(i) {
+            if (!active || board[i]) return;
+            executeMove(i);
+            
+            if (active && mode === 'pve' && turn === 'O') {
+                active = false; // block input
+                setTimeout(aiMove, 600);
             }
         }
 
-        function makeMove(index) {
-            board[index] = currentPlayer;
-            const cell = boardElement.children[index];
-            cell.innerText = currentPlayer;
-            cell.classList.add('occupied', 'symbol-enter');
-            cell.style.color = currentPlayer === 'X' ? '#a5b4fc' : '#fda4af';
-
-            if (checkWin()) {
-                endGame(false);
-            } else if (board.every(c => c !== null)) {
-                endGame(true);
-            } else {
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                updateStatus();
-                isGameActive = true;
-            }
+        function executeMove(i) {
+            board[i] = turn;
+            render();
+            if (checkWin()) return;
+            if (board.every(s => s)) return endGame(null);
+            
+            turn = turn === 'X' ? 'O' : 'X';
+            updateUI();
         }
 
         function aiMove() {
-            if (!isGameActive && board.every(c => c !== null)) return;
-            const emptyCells = board.map((v, i) => v === null ? i : null).filter(v => v !== null);
-            if (emptyCells.length > 0) {
-                const randomIdx = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                isGameActive = true;
-                makeMove(randomIdx);
+            const blanks = board.map((v, i) => v === null ? i : null).filter(v => v !== null);
+            if (blanks.length > 0) {
+                active = true;
+                executeMove(blanks[Math.floor(Math.random() * blanks.length)]);
             }
         }
 
         function checkWin() {
-            for (let cond of winningConditions) {
-                const [a, b, c] = cond;
-                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                    cond.forEach(idx => boardElement.children[idx].classList.add('winning-cell'));
+            for (let p of winPatterns) {
+                if (board[p[0]] && board[p[0]] === board[p[1]] && board[p[0]] === board[p[2]]) {
+                    active = false;
+                    p.forEach(idx => document.getElementById('board').children[idx].classList.add('win'));
+                    setTimeout(() => endGame(board[p[0]]), 600);
                     return true;
                 }
             }
             return false;
         }
 
-        function updateStatus() {
-            statusElement.innerText = `Ход ${currentPlayer === 'X' ? 'Крестиков' : 'Ноликов'}`;
-            playerXElement.className = `px-4 py-1 rounded-xl transition-all duration-300 ${currentPlayer === 'X' ? 'bg-indigo-500 font-bold' : 'opacity-50'}`;
-            playerOElement.className = `px-4 py-1 rounded-xl transition-all duration-300 ${currentPlayer === 'O' ? 'bg-rose-500 font-bold' : 'opacity-50'}`;
+        function updateUI() {
+            const p1 = document.getElementById('p1-label');
+            const p2 = document.getElementById('p2-label');
+            const msg = document.getElementById('status-msg');
+
+            p1.style.opacity = turn === 'X' ? '1' : '0.4';
+            p1.style.background = turn === 'X' ? 'rgba(79, 70, 229, 0.5)' : 'transparent';
+            p2.style.opacity = turn === 'O' ? '1' : '0.4';
+            p2.style.background = turn === 'O' ? 'rgba(225, 29, 72, 0.5)' : 'transparent';
+            
+            msg.innerText = turn === 'X' ? 'Ваш ход (X)...' : (mode === 'pve' ? 'Компьютер думает...' : 'Ход Ноликов (O)...');
         }
 
-        function endGame(draw) {
-            isGameActive = false;
-            const title = document.getElementById('modal-title');
-            const msg = document.getElementById('modal-message');
-            const icon = document.getElementById('winner-icon');
+        function endGame(winner) {
+            active = false;
+            const modal = document.getElementById('win-modal');
+            const title = document.getElementById('win-title');
+            const desc = document.getElementById('win-desc');
+            const icon = document.getElementById('win-icon');
 
-            if (draw) {
-                title.innerText = 'Ничья';
-                msg.innerText = 'Никто не победил. Попробуйте еще раз!';
-                icon.innerText = '🤝';
-            } else {
-                title.innerText = 'Победа!';
-                msg.innerText = `Игрок ${currentPlayer} разгромил соперника!`;
+            modal.classList.remove('hidden');
+            if (winner) {
+                title.innerText = winner === 'X' ? 'ПОБЕДА X!' : 'ПОБЕДА O!';
+                desc.innerText = winner === 'X' ? 'Крестики оказались быстрее.' : 'Нолики взяли верх в этой партии.';
                 icon.innerText = '🏆';
+            } else {
+                title.innerText = 'НИЧЬЯ';
+                desc.innerText = 'Силы равны. Попробуйте еще раз!';
+                icon.innerText = '🤝';
             }
-            
-            setTimeout(() => {
-                modal.classList.remove('hidden');
-                document.getElementById('modal-content').style.transform = 'scale(1)';
-            }, 500);
         }
 
         function closeModal() {
-            modal.classList.add('hidden');
-            document.getElementById('modal-content').style.transform = 'scale(0.9)';
+            document.getElementById('win-modal').classList.add('hidden');
             resetGame();
         }
 
-        function resetGame() {
-            board = Array(9).fill(null);
-            currentPlayer = 'X';
-            isGameActive = true;
-            createBoard();
-            updateStatus();
-        }
-
-        createBoard();
+        // Prevent Pull-to-refresh on mobile
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        }, {passive: false});
     </script>
 </body>
 </html>
